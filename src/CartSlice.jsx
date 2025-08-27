@@ -1,33 +1,43 @@
-// CartSlice.jsx
 import { createSlice } from '@reduxjs/toolkit';
 
 export const CartSlice = createSlice({
   name: 'cart',
   initialState: {
-    items: [], // Initialize items as an empty array
+    items: [], // start with empty cart
   },
   reducers: {
-    // ✅ Implemented addItem for global cart management
+    // ✅ Add item reducer
     addItem: (state, action) => {
-      const newItem = action.payload;
-      const existingItem = state.items.find(item => item.name === newItem.name);
-      if (!existingItem) {
-        state.items.push({ ...newItem, quantity: 1 });
+      const { name, image, cost } = action.payload; // Destructure product details
+      const existingItem = state.items.find(item => item.name === name);
+
+      if (existingItem) {
+        // If already in cart, increase quantity
+        existingItem.quantity++;
       } else {
-        existingItem.quantity += 1;
+        // Else push new item with quantity = 1
+        state.items.push({ name, image, cost, quantity: 1 });
       }
     },
 
+    // ✅ Remove item reducer
     removeItem: (state, action) => {
-      // (unchanged, you can add logic later if required)
+      state.items = state.items.filter(item => item.name !== action.payload);
     },
 
+    // ✅ Update quantity reducer
     updateQuantity: (state, action) => {
-      // (unchanged, you can add logic later if required)
+      const { name, quantity } = action.payload;
+      const itemToUpdate = state.items.find(item => item.name === name);
+      if (itemToUpdate) {
+        itemToUpdate.quantity = quantity;
+      }
     },
   },
 });
 
+// ✅ Export action creators to use in ProductList.jsx & CartItem.jsx
 export const { addItem, removeItem, updateQuantity } = CartSlice.actions;
 
+// ✅ Export reducer to use in store.js
 export default CartSlice.reducer;
